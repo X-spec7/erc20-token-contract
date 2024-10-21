@@ -4,6 +4,15 @@
   "description": "custom eth bundle contract",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "deploy": "ts-node scripts/readline_deploy.ts",
+    "enable:trading": "ts-node scripts/enable_trading.ts",
+    "renounce:ownership": "ts-node scripts/renounce_ownership.ts",
+    "set:tax:fee": "ts-node scripts/set_tax_fee.ts",
+    "set:tax:wallet": "ts-node scripts/set_tax_wallet.ts",
+    "set:tx:limit": "ts-node scripts/set_tx_limit.ts",
+    "set:wallet:limit": "ts-node scripts/set_wallet_limit.ts"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
     "@nomicfoundation/hardhat-ethers": "^3.0.0",

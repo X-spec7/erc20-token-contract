@@ -1,6 +1,5 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
-import { Contract } from "ethers";
 
 describe("CustomToken", function () {
   let tokenContract: any;

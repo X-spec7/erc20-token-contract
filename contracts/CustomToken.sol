@@ -12,8 +12,8 @@ contract CustomToken is ERC20Burnable, Ownable {
   uint8 public tokenDecimals;
   address public taxWallet;
 
-  uint256 public maxTxAmount; // Maximum tokens per transaction
-  uint256 public maxWalletAmount; // Maximum tokens per wallet
+  uint256 public maxTxAmount;
+  uint256 public maxWalletAmount;
 
   bool public tradingEnabled = false;
 
@@ -47,7 +47,7 @@ contract CustomToken is ERC20Burnable, Ownable {
     maxWalletAmount = _maxWalletAmount * 10 ** _decimals;
   }
 
-  function transfer(
+    function transfer(
         address recipient,
         uint256 amount
     ) public virtual override returns (bool) {
@@ -77,10 +77,6 @@ contract CustomToken is ERC20Burnable, Ownable {
             uint256 recipientBalance = balanceOf(recipient);
             require((recipientBalance + transferAmount) <= maxWalletAmount, "Recipient exceeds max wallet limit");
         }
-
-        // if (recipient != owner()) {
-        //     require(balanceOf(recipient) <= maxWalletAmount, "Recipient exceeds max wallet limit");
-        // }
 
         // Transfer remaining amount to recipient
         super._transfer(sender, recipient, transferAmount);

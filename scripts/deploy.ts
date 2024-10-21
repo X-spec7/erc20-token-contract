@@ -1,5 +1,3 @@
-// scripts/deploy_GLDToken.ts
-
 import { ethers } from "hardhat";
 
 async function main() {
@@ -8,7 +6,7 @@ async function main() {
     const CustomToken = await ethers.getContractFactory("CustomToken");
 
     const taxWallet = ethers.Wallet.createRandom();
-
+    
     const tokenContract = await (await CustomToken.deploy(
         "Custom Token",
         "CTK",
@@ -17,7 +15,7 @@ async function main() {
         taxWallet.address,
         10000,
         100000,
-        6
+        4
     )).waitForDeployment();
     
     const tokenContractAddress = await tokenContract.getAddress();
