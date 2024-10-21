@@ -1,13 +1,41 @@
-# Sample Hardhat Project
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+<!-- GETTING STARTED -->
+## Getting Started
 
-Try running some of the following tasks:
+This is a script tool for deploying erc20 token contract on ethereum main network and test networks, and interacting with the contract.
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.ts
-```
+### Prerequisites
+
+This is using forge so make sure you have installed forge and have it in your path.
+Run the following command to install forge:
+
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+
+### Installation
+
+_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
+
+1. Get a free API Key at Infura dashboard
+2. Clone the repo
+   ```sh
+   git clone https://github.com/realhardworkingdeveloper/erc20-deployer
+   ```
+3. Install NPM packages
+   ```sh
+   npm install
+   ```
+   or
+   ```sh
+   yarn install
+   ```
+4. Run the following command to deploy the contract
+   ```sh
+   npm run deploy
+   ```
+   select the network and enter your infura api key and other parameters
+5. Run the following command to enable trading before you make any transactions
+   ```sh
+   npm run enable:trading
+   ```
+6. For other commands, refer to the `package.json` file

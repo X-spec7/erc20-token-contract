@@ -23,7 +23,6 @@ contract CustomToken is ERC20Burnable, Ownable {
   event MaxTxAmountUpdated(uint256 newMaxTxAmount);
   event MaxWalletAmountUpdated(uint256 newMaxWalletAmount);
   event TradingEnabled();
-//   event Transfer(address indexed from, address indexed to, uint256 value);
 
   constructor(
     string memory name_,
