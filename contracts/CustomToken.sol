@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 contract CustomToken is ERC20Burnable, Ownable {
 
   uint8 public taxPercentage;
-  uint8 public tokenDecimals;
+  uint8 private immutable _tokenDecimals;
   address public taxWallet;
 
   uint256 public maxTxAmount;
@@ -41,7 +41,7 @@ contract CustomToken is ERC20Burnable, Ownable {
 
     taxPercentage = _taxPercentage;
     taxWallet = _taxWallet;
-    tokenDecimals = _decimals;
+    _tokenDecimals = _decimals;
     maxTxAmount = _maxTxAmount * 10 ** _decimals;
     maxWalletAmount = _maxWalletAmount * 10 ** _decimals;
   }
@@ -100,13 +100,13 @@ contract CustomToken is ERC20Burnable, Ownable {
 
     // Function to update max transaction amount
     function setMaxTxAmount(uint256 _newMaxTxAmount) external onlyOwner {
-        maxTxAmount = _newMaxTxAmount * 10 ** tokenDecimals;
+        maxTxAmount = _newMaxTxAmount * 10 ** decimals();
         emit MaxTxAmountUpdated(_newMaxTxAmount);
     }
 
     // Function to update max wallet amount
     function setMaxWalletAmount(uint256 _newMaxWalletAmount) external onlyOwner {
-        maxWalletAmount = _newMaxWalletAmount * 10 ** tokenDecimals;
+        maxWalletAmount = _newMaxWalletAmount * 10 ** decimals();
         emit MaxWalletAmountUpdated(_newMaxWalletAmount);
     }
 
@@ -123,6 +123,6 @@ contract CustomToken is ERC20Burnable, Ownable {
     }
 
     function decimals() public view override virtual returns (uint8) {
-        return tokenDecimals;
+        return _tokenDecimals;
     }
 }

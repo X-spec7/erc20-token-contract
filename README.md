@@ -18,7 +18,7 @@ curl -L https://foundry.paradigm.xyz | bash
 1. Get a free API Key at Infura dashboard
 2. Clone the repo
    ```sh
-   git clone https://github.com/realhardworkingdeveloper/erc20-deployer
+   git clone https://github.com/X-spec7/erc20-deployer
    ```
 3. Install NPM packages
    ```sh
