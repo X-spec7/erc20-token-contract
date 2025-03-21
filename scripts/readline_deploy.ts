@@ -4,6 +4,7 @@ import { askQuestion, validateRequiredField, validateNetwork, validatePrivateKey
 import fs from "fs";
 import path from "path";
 import { ethers } from "ethers"; // Import ethers to derive deployer address
+import { WALLET_PRIVATE_KEY, INFURA_PROJECT_ID } from "./keys";
 
 // Function to validate initial supply and ensure it's a positive number
 const validateInitialSupply = (supply: string): boolean => {
@@ -47,11 +48,18 @@ async function main(): Promise<void> {
     if (network === "unichain") {
       rpcUrl = "https://sepolia.unichain.org";
     } else if (network === "sepolia" || network === "mainnet") {
-      do {
-        infuraProjectId = await askQuestion("Enter your Infura Project ID: ");
-      } while (!validateRequiredField(infuraProjectId));
+      if (INFURA_PROJECT_ID == undefined) {
+        throw new Error ("Invalid Infura Project ID");
+      }
+      infuraProjectId = INFURA_PROJECT_ID;
       rpcUrl = `https://${network}.infura.io/v3/${infuraProjectId}`;
     }
+
+    if (WALLET_PRIVATE_KEY === undefined) {
+      throw new Error ("Invalid wallet private key");
+    }
+    
+    let privateKey: string = WALLET_PRIVATE_KEY;
 
     let name: string;
     do {
@@ -93,11 +101,6 @@ async function main(): Promise<void> {
       decimals = await askQuestion("Enter the token decimals (usually 18): ");
     } while (!validateRequiredField(decimals));
 
-    let privateKey: string;
-    do {
-      privateKey = await askQuestion("Enter your private key (0x...): ");
-    } while (!validatePrivateKey(privateKey));
-
     // Derive deployer address from private key
     const deployerWallet = new ethers.Wallet(privateKey);
     const deployerAddress = deployerWallet.address;
@@ -106,7 +109,8 @@ async function main(): Promise<void> {
     const cmd = `forge create contracts/CustomToken.sol:CustomToken \
       --rpc-url ${rpcUrl} \
       --private-key "${privateKey}" \
-      --constructor-args "${name}" "${symbol}" ${initialSupply} ${taxPercentage} ${taxWallet} ${maxTxAmount} ${maxWalletAmount} ${decimals}`;
+      --constructor-args "${name}" "${symbol}" ${initialSupply} ${taxPercentage} ${taxWallet} ${maxTxAmount} ${maxWalletAmount} ${decimals} \
+      --gas-price 100000000000`;
 
     console.log("Running command:", cmd);
 

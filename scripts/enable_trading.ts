@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import * as readline from "readline";
 import { rl, askQuestion, validatePrivateKey, validateNetwork, validateRequiredField } from "./util";
+import { WALLET_PRIVATE_KEY, INFURA_PROJECT_ID } from "./keys";
 
 async function main(): Promise<void> {
   try {
@@ -17,9 +18,10 @@ async function main(): Promise<void> {
     if (network === "unichain") {
       rpcUrl = "https://sepolia.unichain.org";
     } else if (network === "sepolia" || network === "mainnet") {
-      do {
-        infuraProjectId = await askQuestion("Enter your Infura Project ID: ");
-      } while (!validateRequiredField(infuraProjectId));
+      if (INFURA_PROJECT_ID == undefined) {
+        throw new Error ("Invalid Infura Project ID");
+      }
+      infuraProjectId = INFURA_PROJECT_ID;
       rpcUrl = `https://${network}.infura.io/v3/${infuraProjectId}`;
     }
 
@@ -28,11 +30,12 @@ async function main(): Promise<void> {
     do {
       contractAddress = await askQuestion("Enter the contract address: ");
     } while (!validateRequiredField(contractAddress));
-    
-    let privateKey: string;
-    do {
-      privateKey = await askQuestion("Enter your private key (0x...): ");
-    } while (!validatePrivateKey(privateKey));
+
+    if (WALLET_PRIVATE_KEY === undefined) {
+      throw new Error ("Invalid wallet private key");
+    }
+
+    let privateKey: string = WALLET_PRIVATE_KEY;
 
     // Set up RPC provider
     const provider = new ethers.JsonRpcProvider(rpcUrl);

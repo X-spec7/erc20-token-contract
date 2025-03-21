@@ -2,13 +2,22 @@
 import { ethers } from "ethers"
 import { encodeSqrtRatioX96, nearestUsableTick, NonfungiblePositionManager, Position, Pool, } from "@uniswap/v3-sdk"
 import { Percent, Token } from "@uniswap/sdk-core"
-import { env } from "process"
+import IUniswapV3PoolABI from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json'
+import UniswapV3Factory from '@uniswap/v3-core/artifacts/contracts/UniswapV3Factory.sol/UniswapV3Factory.json'
+import NftPositionManager from '@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json'
 
-env.config()
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID
+
+if (!PRIVATE_KEY || !INFURA_PROJECT_ID || !ETHERSCAN_API_KEY) {
+  throw new Error("Please set your private key, infura project id and etherscan api key in a .env file")
+}
+
 const SEPOLIA_CHAIN_ID = 11155111
 
 const ERC20_ADDRESS = "0xc3761eb917cd790b30dad99f6cc5b4ff93c4f9ea"
@@ -34,13 +43,13 @@ const wallet = new ethers.Wallet(
 )
 const sepoliaWallet = wallet.connect(sepoliaProvider)
 
-const getAbi = async (contractAddress) => {
+const getAbi = async (contractAddress: string) => {
   const requestUrl = `https://api.etherscan.io/api?module=contract&action=getabi&address=${contractAddress}&apikey=${ETHERSCAN_API_KEY}`
   const abiJSON = await (await fetch(requestUrl)).json()
   return JSON.parse(abiJSON.result)
 }
 
-const getPoolState = async (poolContract) => {
+const getPoolState = async (poolContract: ethers.Contract) => {
   const liquidity = await poolContract.liquidity()
   const slot = await poolContract.slot0()
 
@@ -58,17 +67,14 @@ const getPoolState = async (poolContract) => {
 
 async function main() {
 
-  const uniswapFactoryAbi = await getAbi(UNISWAP_FACTORY_ADDRESS)
-  const nfPositionManagerAbi = await getAbi(NF_POSITION_MANAGER_ADDRESS)
-
   const nfPositionManagerContract = new ethers.Contract(
     NF_POSITION_MANAGER_ADDRESS,
-    nfPositionManagerAbi,
+    NftPositionManager.abi,
     sepoliaProvider
   )
   const uniswapFactoryContract = new ethers.Contract(
     UNISWAP_FACTORY_ADDRESS,
-    uniswapFactoryAbi,
+    UniswapV3Factory.abi,
     sepoliaProvider
   )
 
@@ -92,13 +98,14 @@ async function main() {
   )
   if (poolAddress === "0x0000000000000000000000000000000000000000") {
     console.log("Creating pool...")
-    const tx = await uniswapFactoryContract.connect(sepoliaWallet).createPool(
+    const tx = await uniswapFactoryContract.createPool(
       YETI_TOKEN_ADDRESS,
       PAPOI_TOKEN_ADDRESS,
       FEE_TIER
     )
     console.log("Transaction hash:", tx.hash)
-    const receipt = await tx.wait()
+    const receipt = await sepoliaWallet.sendTransaction(tx)
+    // const receipt = await tx.wait()
     console.log("Pool created. Transaction confirmed in block:", receipt.blockNumber)
   }
 
@@ -118,16 +125,17 @@ async function main() {
   const poolContractAbi = await getAbi(poolAddress)
   const poolContract = new ethers.Contract(
     poolAddress,
-    poolContractAbi,
+    IUniswapV3PoolABI.abi,
     sepoliaProvider
   )
 
   // Initialize pool
-  const tx = await poolContract.connect(sepoliaWallet).initialize(price.toString(), {
+  const tx = await poolContract.initialize(price.toString(), {
     gasLimit: 3000000,
   })
   console.log("Transaction hash:", tx.hash)
-  const receipt = await tx.wait()
+  const receipt = await sepoliaWallet.sendTransaction(tx)
+  // const receipt = await tx.wait()
   console.log("Pool initialized. Transaction confirmed in block:", receipt.blockNumber)
 
   const state = await getPoolState(poolContract)
